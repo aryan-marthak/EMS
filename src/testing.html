@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Employee Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .user-info h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .user-info p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .notification-bell {
+            position: relative;
+            background: rgba(51, 65, 85, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-bell:hover {
+            background: rgba(51, 65, 85, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-bar {
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #e2e8f0;
+            width: 250px;
+        }
+        
+        .search-bar::placeholder {
+            color: #94a3b8;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .left-section {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .top-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .task-overview {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-card.new { background: rgba(239, 68, 68, 0.2); }
+        .stat-card.completed { background: rgba(59, 130, 246, 0.2); }
+        .stat-card.active { background: rgba(34, 197, 94, 0.2); }
+        .stat-card.failed { background: rgba(245, 158, 11, 0.2); }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+        }
+        
+        .your-tasks {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .task-filters {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .filter-btn {
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+        
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .task-item:hover {
+            background: rgba(51, 65, 85, 0.5);
+            transform: translateX(4px);
+        }
+        
+        .task-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        
+        .priority {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .priority.high { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        .priority.medium { background: rgba(245, 158, 11, 0.3); color: #fcd34d; }
+        .priority.low { background: rgba(34, 197, 94, 0.3); color: #86efac; }
+        
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .task-btn {
+            background: none;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+        
+        .task-btn.complete {
+            border-color: #22c55e;
+            color: #86efac;
+        }
+        
+        .task-btn.complete:hover {
+            background: rgba(34, 197, 94, 0.2);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            transition: width 0.3s ease;
+        }
+        
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .widget {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .calendar-widget {
+            text-align: center;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+            margin-top: 1rem;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background: rgba(51, 65, 85, 0.5);
+        }
+        
+        .calendar-day.today {
+            background: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+        
+        .calendar-day.has-task {
+            background: rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+        
+        .upcoming-deadlines {
+            list-style: none;
+        }
+        
+        .deadline-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .deadline-item:last-child {
+            border-bottom: none;
+        }
+        
+        .deadline-date {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        
+        .team-members {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .member-status {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+        
+        .status-indicator.away {
+            background: #f59e0b;
+        }
+        
+        .status-indicator.offline {
+            background: #6b7280;
+        }
+        
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .top-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="user-info">
+            <h1>Welcome back, Amit 👋</h1>
+            <p>Today is Monday, June 15, 2025</p>
+        </div>
+        <div class="header-actions">
+            <input type="text" class="search-bar" placeholder="Search tasks, projects...">
+            <button class="notification-bell">
+                🔔
+                <span class="notification-badge">3</span>
+            </button>
+            <button class="action-btn">Log Out</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="left-section">
+            <div class="top-row">
+                <div class="task-overview">
+                    <h2>Task Overview</h2>
+                    <div class="overview-grid">
+                        <div class="stat-card new">
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">New Tasks</div>
+                        </div>
+                        <div class="stat-card completed">
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-card active">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="stat-card failed">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Overdue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h2>Quick Actions</h2>
+                    <div class="action-buttons">
+                        <button class="action-btn">+ New Task</button>
+                        <button class="action-btn secondary">📊 View Reports</button>
+                        <button class="action-btn">📅 Schedule Meeting</button>
+                        <button class="action-btn secondary">💬 Team Chat</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="your-tasks">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Your Tasks</h2>
+                    <span style="color: #94a3b8; font-size: 0.9rem;">5 Tasks</span>
+                </div>
+                
+                <div class="task-filters">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Today</button>
+                    <button class="filter-btn">This Week</button>
+                    <button class="filter-btn">High Priority</button>
+                    <button class="filter-btn">Overdue</button>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>Complete project report</h4>
+                        <div class="task-meta">
+                            <span>📅 2025-02-24</span>
+                            <span>🏷️ Work</span>
+                            <span class="priority high">HIGH</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-btn">Edit</button>
+                        <button class="task-btn complete">Complete</button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>Attend team meeting</h4>
+                        <div class="task-meta">
+                            <span>📅 2025-02-25</span>
+                            <span>🏷️ Meeting</span>
+                            <span class="priority medium">MEDIUM</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-btn">Edit</button>
+                        <button class="task-btn complete">Complete</button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>Review code documentation</h4>
+                        <div class="task-meta">
+                            <span>📅 2025-02-26</span>
+                            <span>🏷️ Development</span>
+                            <span class="priority low">LOW</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%"></div>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-btn">Edit</button>
+                        <button class="task-btn complete">Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-sidebar">
+            <div class="widget calendar-widget">
+                <h3>📅 Calendar</h3>
+                <div style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #94a3b8;">June 2025</div>
+                <div class="calendar-grid">
+                    <div class="calendar-day" style="color: #64748b;">S</div>
+                    <div class="calendar-day" style="color: #64748b;">M</div>
+                    <div class="calendar-day" style="color: #64748b;">T</div>
+                    <div class="calendar-day" style="color: #64748b;">W</div>
+                    <div class="calendar-day" style="color: #64748b;">T</div>
+                    <div class="calendar-day" style="color: #64748b;">F</div>
+                    <div class="calendar-day" style="color: #64748b;">S</div>
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day">2</div>
+                    <div class="calendar-day">3</div>
+                    <div class="calendar-day">4</div>
+                    <div class="calendar-day">5</div>
+                    <div class="calendar-day">6</div>
+                    <div class="calendar-day">7</div>
+                    <div class="calendar-day">8</div>
+                    <div class="calendar-day">9</div>
+                    <div class="calendar-day">10</div>
+                    <div class="calendar-day">11</div>
+                    <div class="calendar-day">12</div>
+                    <div class="calendar-day">13</div>
+                    <div class="calendar-day">14</div>
+                    <div class="calendar-day today">15</div>
+                    <div class="calendar-day">16</div>
+                    <div class="calendar-day">17</div>
+                    <div class="calendar-day">18</div>
+                    <div class="calendar-day">19</div>
+                    <div class="calendar-day">20</div>
+                    <div class="calendar-day">21</div>
+                    <div class="calendar-day">22</div>
+                    <div class="calendar-day">23</div>
+                    <div class="calendar-day has-task">24</div>
+                    <div class="calendar-day has-task">25</div>
+                    <div class="calendar-day">26</div>
+                    <div class="calendar-day">27</div>
+                    <div class="calendar-day">28</div>
+                    <div class="calendar-day">29</div>
+                    <div class="calendar-day">30</div>
+                </div>
+            </div>
+
+            <div class="widget">
+                <h3>⏰ Upcoming Deadlines</h3>
+                <ul class="upcoming-deadlines">
+                    <li class="deadline-item">
+                        <div>
+                            <div style="font-size: 0.9rem;">Project Report</div>
+                            <div class="deadline-date">Due Feb 24</div>
+                        </div>
+                        <span style="color: #f59e0b;">2 days</span>
+                    </li>
+                    <li class="deadline-item">
+                        <div>
+                            <div style="font-size: 0.9rem;">Team Meeting</div>
+                            <div class="deadline-date">Due Feb 25</div>
+                        </div>
+                        <span style="color: #22c55e;">3 days</span>
+                    </li>
+                    <li class="deadline-item">
+                        <div>
+                            <div style="font-size: 0.9rem;">Code Review</div>
+                            <div class="deadline-date">Due Feb 28</div>
+                        </div>
+                        <span style="color: #22c55e;">6 days</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="widget">
+                <h3>👥 Team Members</h3>
+                <div class="team-members">
+                    <div class="team-member">
+                        <div class="avatar">JS</div>
+                        <div class="member-info">
+                            <div class="member-name">John Smith</div>
+                            <div class="member-status">Working on API</div>
+                        </div>
+                        <div class="status-indicator"></div>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669);">SD</div>
+                        <div class="member-info">
+                            <div class="member-name">Sarah Davis</div>
+                            <div class="member-status">In meeting</div>
+                        </div>
+                        <div class="status-indicator away"></div>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">MJ</div>
+                        <div class="member-info">
+                            <div class="member-name">Mike Johnson</div>
+                            <div class="member-status">Last seen 2h ago</div>
+                        </div>
+                        <div class="status-indicator offline"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget">
+                <h3>📊 This Week's Progress</h3>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.9rem;">Tasks Completed</span>
+                        <span style="font-size: 0.9rem; font-weight: 600;">12/15</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.9rem;">Hours Worked</span>
+                        <span style="font-size: 0.9rem; font-weight: 600;">32/40</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                </div>
+                <div style="font-size: 0.8rem; color: #94a3b8; text-align: center;">
+                    Great progress this week! 🎉
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
